@@ -5,10 +5,13 @@
 package net.psexton.lifesaverdedupe;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,7 +44,16 @@ public class Main {
             File copy = new File(filePath + "New");
             
             ArrayList<String> entries = readOriginal(original);
+            
+            System.out.println("========== Original ==========");
+            for(String entry : entries) System.out.println(entry);
+            
             dedupe(entries);
+            
+            System.out.println("========== Deduped ==========");
+            for(String entry : entries) System.out.println(entry);
+            
+            writeCopy(entries, copy);
             
             // If that succeeded, rename the files
             //     MessageLogNew -> MessageLog
@@ -85,9 +97,45 @@ public class Main {
         return entries;
     }
     
+    /**
+     * Deletes adjoining duplicate entries in-place
+     * @param entries ArrayList to operate on
+     * Comparisons are done using String's equals method
+     */
     private void dedupe(ArrayList<String> entries) {
-        for(String entry : entries) {
-            System.out.println(entry);
+        int i = 1;
+        while(i < entries.size()) {
+            // Start with the second entry. 
+            // Compare each entry to the preceding one
+            // If they're the same, delete the current entry
+            // If they're different, increment i
+            String previous = entries.get(i-1);
+            String current = entries.get(i);
+            if(previous.equals(current))
+                entries.remove(i);
+            else
+                i++;
         }
+    }
+    
+    /**
+     * 
+     * @param entries ArrayList of entries to write
+     * @param copy File to write to
+     * @throws IOException rethrown from Writer constructors
+     */
+    private void writeCopy(ArrayList<String> entries, File copy) throws IOException {
+        PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(copy)));
+        
+        // First line is the message count
+        writer.println(entries.size());
+        
+        // Rest of file is entries array, one entry per line
+        for(String entry : entries) {
+            writer.println(entry);
+        }
+        
+        writer.flush();
+        writer.close();
     }
 }
