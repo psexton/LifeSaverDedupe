@@ -42,17 +42,8 @@ public class Main {
             //     MessageLog ===> MessageLogNew
             File original = new File(filePath);
             File copy = new File(filePath + "New");
-            
             ArrayList<String> entries = readOriginal(original);
-            
-            System.out.println("========== Original ==========");
-            for(String entry : entries) System.out.println(entry);
-            
             dedupe(entries);
-            
-            System.out.println("========== Deduped ==========");
-            for(String entry : entries) System.out.println(entry);
-            
             writeCopy(entries, copy);
             
             // If that succeeded, rename the files
